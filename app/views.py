@@ -106,4 +106,31 @@ def view_post(request, id):
     return render(request,'post.html',{'posts':post, "comments":comments})
 
 
+def share_post(request):
+    """ share post """
+
+    data=request.POST
+    name=data.get('name')
+    comments=data.get('comments')
+    email=data.get('email')
+    to=data.get('to')
+    url=data.get('url')
+
+    context = {
+        'name': name,
+        'email': email,
+        'comments': comments,
+        'to': to,
+        "url" :url
+        }
+    template = render_to_string('email_content.html', {'request':request,'context': context})
+    try:
+        email = EmailMessage(  
+                        "My post", template, to=[to]  
+            )  
+        email.send()
+    except BadHeaderError:
+        return HttpResponse('Failed Please Try Again ')
+
+    return redirect('/')
 
